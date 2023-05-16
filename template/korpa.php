@@ -50,7 +50,11 @@ if ($products_in_cart) {
     $arrayKeys = array_keys($products_in_cart);
     $stmt->bind_param(str_repeat("s", count($arrayKeys)), ...$arrayKeys);
     $stmt->execute();
-    $products = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
+    $result = $stmt->get_result();
+
+    while ($row = $result->fetch_assoc()) {
+        $products[$row['id']] = $row;
+    }
 
     foreach ($products as $product) {
         $subtotal += (float)$product['cijena'] * (int)$products_in_cart[$product['id']];
@@ -58,18 +62,26 @@ if ($products_in_cart) {
  } 
 
  if(array_key_exists('narudzba', $_POST) && !empty($_SESSION['cart'])) {
-     $num = count($products_in_cart); 
-     foreach ($products as $product) {
-          $name[] =  $product['naziv'];
-          $qty[] = $products_in_cart[$product['id']];
-        }
-        // print_r($name);exit;
+    $num = count($products_in_cart); 
+    $name = array();
+    $qty = array();
 
-        createOrder($db, $name, $qty , key($_SESSION['ulogovan']), $num); 
+    foreach ($arrayKeys as $key) {
+        $name[] = $products[$key]['naziv'];
+        $qty[] = $products_in_cart[$key];
+    }
+
+    createOrder($db, $name, $qty , key($_SESSION['ulogovan']), $num); 
 }   
+
 ?>
 
 <div class="cart content-wrapper">
+
+    <?php if (isset($_GET["msg"]) && $_GET["msg"] == "success"): ?>
+        <h2>Hvala Vam na narudzbi !</h2>
+    <?php else: ?>
+
     <h2>Vaša korpa</h2>
     <form  method="post">
         <table>
@@ -118,4 +130,5 @@ if ($products_in_cart) {
             <p class ="error"> Prijavite se da biste izvršili narudžbu.</p>
         <?php endif;?>
     </form>
+   <?php endif; ?>
 </div>

@@ -12,11 +12,6 @@ switch($page) {
     break;
     case 'jelovnik' :
         $page = 'jelovnik';
-        echo '<style>
-           footer {
-               position: static;
-           } 
-        </style>';
     break;
     case 'sign_in' :
         $page = 'sign_in';
@@ -29,11 +24,6 @@ switch($page) {
     break;
     case 'admin' :
         $page = 'admin';
-        echo '<style>
-        footer {
-            position: static;
-        } 
-     </style>';
     break;
     case 'edit' :
         $page= 'edit';
@@ -44,16 +34,14 @@ switch($page) {
     case 'delete' :
         $page= 'delete';
     break;
+    case 'narudzbe' :
+        $page= 'narudzbe';
+    break;
     case 'korpa' :
         $page= 'korpa';
     break;
     case 'blog' :
         $page= 'blog';
-        echo '<style>
-        footer {
-            position: static;
-        } 
-     </style>';
     break;
     default:
         $page = '404';

@@ -184,39 +184,32 @@ function emptyInputAdd($naziv, $opis, $cijena) {
 		return $result;
 	}
 
-	// function createOrder($conn,$naziv,$kolicina){
-	// 	$new_order = "INSERT INTO narudzbe (naziv,kolicina,ime,prezime,adresa) VALUES (?, ?, ?, ?, ?);";
-	// 	$stmt = mysqli_stmt_init($conn);
-	// 	if (!mysqli_stmt_prepare($stmt, $new_order)) {
-	// 		header('Location: ../index.php?action=page&page=korpa&error=stmtfailed');
-	// 		exit();
-	// 	}
-	// 	mysqli_stmt_bind_param($stmt, "ss",$naziv,$kolicina);
-	// 	mysqli_stmt_execute($stmt);
-	// 	mysqli_stmt_close($stmt);
-	// 	header('Location: ../index.php?action=page&page=korpa&msg=success');	
-	// 	exit();
-	// }
 
-function createOrder($conn,$naziv,$kolicina,$id,$num) {
-
-	$podaci = "SELECT ime,prezime,adresa  
-	FROM korisnici 
-	WHERE id_korisnik = $id";
-	$korisnik = mysqli_query($conn, $podaci);
-	while($row=mysqli_fetch_assoc($korisnik)) {
-		$resultset[] = $row;
+	function createOrder($connection, $naziv, $kolicina, $id, $num) {
+		$podaci = "SELECT ime, prezime, adresa FROM korisnici WHERE id_korisnik = ?";
+		$stmt = mysqli_prepare($connection, $podaci);
+		mysqli_stmt_bind_param($stmt, 'i', $id);
+		mysqli_stmt_execute($stmt);
+		$result = mysqli_stmt_get_result($stmt);
+		$resultset = mysqli_fetch_assoc($result);
+	
+		$sql = "INSERT INTO narudzbe (naziv, kolicina, ime, prezime, adresa) VALUES (?, ?, ?, ?, ?)";
+		$stmt = mysqli_prepare($connection, $sql);
+	
+		for ($i = 0; $i < $num; $i++) {
+			$naziv_item = $naziv[$i];
+			$kolicina_item = $kolicina[$i];
+			mysqli_stmt_bind_param($stmt, 'sisss', $naziv_item, $kolicina_item, $resultset['ime'], $resultset['prezime'], $resultset['adresa']);
+			mysqli_stmt_execute($stmt);
+		}
+	
+		mysqli_stmt_close($stmt);
+		mysqli_close($connection);
+	
+		unset($_SESSION['cart']);
+	
+		header('Location: ./index.php?action=page&page=korpa&msg=success');
+		exit();
 	}
-	$sql = "INSERT INTO narudzbe(naziv,kolicina,ime,prezime,adresa) VALUES";
-	for($i=0;$i<$num;$i++) {
-		$ValuesAddToQuery[] = "('$naziv[$i]','$kolicina[$i]','{$resultset[0]['ime']}','{$resultset[0]['prezime']}','{$resultset[0]['adresa']}')";
-	}
-	$sql .= implode(',', $ValuesAddToQuery);
-	print_r($sql);exit;
-	mysqli_query($conn, $sql);
-	mysqli_close($conn);
-	header('Location: ./index.php?action=page&page=korpa&msg=success');	
-	exit();
-}
 
 ?>

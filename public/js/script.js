@@ -1,14 +1,12 @@
-var slideIndex = 0;
+let slideIndex = 0;
 
 showSlides();
 
 function showSlides() {
 
-  var i;
+  const slides = document.getElementsByClassName("slide"); 
 
-  var slides = document.getElementsByClassName("slide"); 
-
-  for (i = 0; i < slides.length; i++) {
+  for (let i = 0; i < slides.length; i++) {
     slides[i].style.display = "none";
   }
 
@@ -19,3 +17,4 @@ function showSlides() {
   slides[slideIndex - 1].style.display = "block";
   setTimeout(showSlides, 3000);
 }
+
